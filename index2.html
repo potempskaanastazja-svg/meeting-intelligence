@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meeting Intelligence — Anastazja Potempska</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.2.0/dist/tabler-icons.min.css">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #ffffff;
+  --bg-secondary: #f6f6f4;
+  --bg-tertiary: #f0efeb;
+  --text-primary: #1a1a18;
+  --text-secondary: #6b6b67;
+  --text-tertiary: #9b9b96;
+  --border: rgba(0,0,0,0.12);
+  --border-md: rgba(0,0,0,0.22);
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1c1a;
+    --bg-secondary: #252523;
+    --bg-tertiary: #2e2e2b;
+    --text-primary: #f0efe9;
+    --text-secondary: #9b9b96;
+    --text-tertiary: #6b6b67;
+    --border: rgba(255,255,255,0.10);
+    --border-md: rgba(255,255,255,0.20);
+  }
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.author {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.author a {
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.author a:hover { text-decoration: underline; }
+
+.hero { margin-bottom: 2rem; }
+.hero h1 { font-size: 26px; font-weight: 600; color: var(--text-primary); letter-spacing: -0.3px; }
+.hero p { font-size: 15px; color: var(--text-secondary); margin-top: 6px; line-height: 1.5; }
+
+.card {
+  background: var(--bg);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+label { font-size: 13px; color: var(--text-secondary); display: block; margin-bottom: 8px; }
+
+textarea {
+  width: 100%;
+  min-height: 160px;
+  font-size: 14px;
+  font-family: var(--font);
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  resize: vertical;
+  line-height: 1.6;
+  transition: border-color 0.15s;
+}
+
+textarea:focus { outline: none; border-color: var(--border-md); }
+textarea::placeholder { color: var(--text-tertiary); }
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 0.5px solid var(--border-md);
+  border-radius: var(--radius-md);
+  padding: 7px 13px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: var(--font);
+  transition: background 0.12s;
+}
+
+.btn-ghost:hover { background: var(--bg-secondary); }
+
+select {
+  background: var(--bg-secondary);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 7px 10px;
+  font-size: 13px;
+  color: var(--text-primary);
+  font-family: var(--font);
+  cursor: pointer;
+}
+
+.btn-primary {
+  margin-left: auto;
+  background: var(--text-primary);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--font);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.15s;
+}
+
+.btn-primary:hover { opacity: 0.82; }
+.btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.loading {
+  display: none;
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border);
+  border-top-color: var(--text-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: -4px;
+  margin-right: 8px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error {
+  display: none;
+  background: #FCEBEB;
+  border: 0.5px solid #F09595;
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #791F1F;
+  margin-bottom: 1rem;
+}
+
+.results { display: none; }
+
+.results-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.results-top p { font-size: 13px; color: var(--text-tertiary); }
+
+.summary-box {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 1rem;
+}
+
+.stat {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  text-align: center;
+}
+
+.stat-num { font-size: 24px; font-weight: 600; color: var(--text-primary); }
+.stat-label { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+
+.section { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+
+.section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; }
+.section-icon { font-size: 17px; color: var(--text-secondary); }
+.section-title { font-size: 15px; font-weight: 500; }
+
+.badge {
+  font-size: 11px;
+  padding: 2px 9px;
+  border-radius: 20px;
+  margin-left: auto;
+  font-weight: 500;
+}
+
+.badge-action { background: #E6F1FB; color: #0C447C; }
+.badge-decision { background: #EAF3DE; color: #27500A; }
+.badge-risk { background: #FAECE7; color: #712B13; }
+.badge-jira { background: #EEEDFE; color: #3C3489; }
+
+.item { border-top: 0.5px solid var(--border); padding: 10px 0; }
+.item:first-child { border-top: none; padding-top: 0; }
+.item-main { font-size: 14px; color: var(--text-primary); line-height: 1.5; }
+.item-meta { font-size: 12px; color: var(--text-secondary); margin-top: 5px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.meta-tag { display: flex; align-items: center; gap: 4px; }
+
+.ticket {
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  margin-top: 6px;
+}
+
+.ticket-type { font-size: 11px; color: var(--text-tertiary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
+.ticket-title { font-weight: 500; font-size: 14px; color: var(--text-primary); margin-bottom: 5px; }
+.ticket-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+
+.footer {
+  margin-top: 3rem;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.footer a { color: var(--text-tertiary); text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .controls { flex-direction: column; align-items: stretch; }
+  .btn-primary { margin-left: 0; justify-content: center; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="top-bar">
+    <div style="font-size:14px; font-weight:500; color:var(--text-primary);">
+      <i class="ti ti-brain" aria-hidden="true" style="vertical-align:-2px; margin-right:5px;"></i>Meeting Intelligence
+    </div>
+    <div class="author">by <a href="https://linkedin.com/in/anastazja-potempska-7b046a341" target="_blank">Anastazja Potempska</a></div>
+  </div>
+
+  <div class="hero">
+    <h1>Turn any call transcript into a structured brief</h1>
+    <p>Paste a meeting transcript and get action items, decisions, risks and Jira-ready tickets — powered by Claude.</p>
+  </div>
+
+  <div id="input-section">
+    <div class="card" style="margin-bottom:0.5rem;">
+      <label for="apikey">Anthropic API key <span style="color:var(--text-tertiary); font-weight:400;">(get one free at <a href="https://console.anthropic.com" target="_blank" style="color:var(--text-secondary);">console.anthropic.com</a>)</span></label>
+      <input type="password" id="apikey" placeholder="sk-ant-..." style="width:100%; font-size:14px; font-family:var(--font); color:var(--text-primary); background:var(--bg-secondary); border:0.5px solid var(--border); border-radius:var(--radius-md); padding:9px 12px;">
+    </div>
+    <div class="card">
+      <label for="transcript">Transcript</label>
+      <textarea id="transcript" placeholder="Paste your meeting transcript here...&#10;&#10;Works with Zoom / Google Meet / Teams exports, raw notes, or anything you've typed up."></textarea>
+      <div class="controls">
+        <button class="btn-ghost" onclick="loadExample()">
+          <i class="ti ti-file-text" aria-hidden="true" style="vertical-align:-2px; margin-right:4px;"></i>Load example
+        </button>
+        <select id="lang">
+          <option value="English">Output in English</option>
+          <option value="Polish">Output in Polish</option>
+        </select>
+        <button class="btn-primary" id="analyze-btn" onclick="analyze()">
+          <i class="ti ti-sparkles" aria-hidden="true"></i> Analyze
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading" class="loading">
+    <span class="spinner"></span>Analyzing with Claude...
+  </div>
+
+  <div id="error-box" class="error"></div>
+
+  <div id="results" class="results">
+    <div class="results-top">
+      <p>Analysis complete</p>
+      <button class="btn-ghost" onclick="reset()">
+        <i class="ti ti-refresh" aria-hidden="true" style="vertical-align:-2px; margin-right:4px;"></i>New transcript
+      </button>
+    </div>
+
+    <div id="summary-box" class="summary-box"></div>
+
+    <div class="stats-row">
+      <div class="stat"><div class="stat-num" id="cnt-a">0</div><div class="stat-label">Action items</div></div>
+      <div class="stat"><div class="stat-num" id="cnt-d">0</div><div class="stat-label">Decisions</div></div>
+      <div class="stat"><div class="stat-num" id="cnt-r">0</div><div class="stat-label">Risks</div></div>
+      <div class="stat"><div class="stat-num" id="cnt-t">0</div><div class="stat-label">Jira tickets</div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <i class="ti ti-checkbox section-icon" aria-hidden="true"></i>
+        <span class="section-title">Action items</span>
+        <span class="badge badge-action" id="b-a"></span>
+      </div>
+      <div id="list-a"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <i class="ti ti-gavel section-icon" aria-hidden="true"></i>
+        <span class="section-title">Decisions made</span>
+        <span class="badge badge-decision" id="b-d"></span>
+      </div>
+      <div id="list-d"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <i class="ti ti-alert-triangle section-icon" aria-hidden="true"></i>
+        <span class="section-title">Risks & blockers</span>
+        <span class="badge badge-risk" id="b-r"></span>
+      </div>
+      <div id="list-r"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <i class="ti ti-clipboard-list section-icon" aria-hidden="true"></i>
+        <span class="section-title">Jira tickets</span>
+        <span class="badge badge-jira" id="b-t"></span>
+      </div>
+      <div id="list-t"></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Built with Claude (Anthropic) &middot; <a href="https://linkedin.com/in/anastazja-potempska-7b046a341" target="_blank">LinkedIn</a>
+  </div>
+
+</div>
+
+<script>
+const EXAMPLE = `Sprint planning — Project: FinTrack Mobile (client: NordBank)
+Date: June 14, 2026 | Attendees: Kasia (PM), Marek (Tech Lead), Julia (Frontend), Tomek (Backend), Sara (QA)
+
+Kasia: Ok let's get started. Marek, can you give us a quick status on the authentication module?
+
+Marek: So the OAuth flow is done, but we hit a problem with token refresh on iOS. It's a known issue with the library we're using. I'd say it adds 3 days to the timeline.
+
+Julia: I can look into a workaround — there's a community patch that might work. I'll check it today.
+
+Kasia: Good. Let's assume Julia takes ownership of the iOS token issue and we reassess on Wednesday. Tomek, what about the transaction API?
+
+Tomek: The endpoints are ready, but we're still waiting on the test credentials from NordBank. I've emailed them twice. No response.
+
+Kasia: That's a real blocker. I'll escalate directly to our account manager at NordBank today — we cannot start QA without those credentials.
+
+Sara: Speaking of QA — I need at least 5 business days for a proper regression run before release. If the API delays stretch past Friday, we're going to miss the June 30 deadline.
+
+Kasia: Noted. So the decision is: we hold the June 30 date as a target but flag it as at-risk internally. I'll update the client with a heads-up but not a formal delay notification yet. Everyone ok with that?
+
+Marek: Fine by me. Also — we should talk about the dashboard performance issue. On lower-end Android devices, the chart rendering is dropping below 30fps. It's not critical but clients mentioned it in UAT feedback.
+
+Julia: I can optimize the rendering in sprint 4 if we deprioritize the dark mode feature. Dark mode was a nice-to-have anyway.
+
+Kasia: Agreed. Dark mode moves to backlog, chart performance goes into sprint 4. Marek, can you create the ticket?
+
+Marek: Will do.
+
+Kasia: Ok, let's wrap up. Main things: Julia owns the iOS patch, I'm escalating NordBank credentials, June 30 is at-risk, dark mode to backlog, chart optimization in sprint 4.`;
+
+function loadExample() {
+  document.getElementById('transcript').value = EXAMPLE;
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function priorityColor(p) {
+  if (!p) return 'var(--text-tertiary)';
+  if (p.toLowerCase() === 'high') return '#993C1D';
+  if (p.toLowerCase() === 'medium') return '#854F0B';
+  return '#3B6D11';
+}
+
+async function analyze() {
+  const transcript = document.getElementById('transcript').value.trim();
+  if (!transcript) return;
+  const lang = document.getElementById('lang').value;
+  const apiKey = document.getElementById('apikey').value.trim();
+  if (!apiKey) {
+    const eb = document.getElementById('error-box');
+    eb.textContent = 'Please enter your Anthropic API key above.';
+    eb.style.display = 'block';
+    return;
+  }
+
+  document.getElementById('input-section').style.display = 'none';
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('error-box').style.display = 'none';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('analyze-btn').disabled = true;
+
+  const prompt = `You are a senior Project Manager assistant. Analyze this meeting transcript and extract structured information.
+
+Respond ONLY with a valid JSON object. No markdown fences, no preamble, no explanation. Use this exact schema:
+{
+  "summary": "2-3 sentence meeting summary",
+  "actions": [{"task": "task description", "owner": "person name or TBD", "due": "deadline or ASAP or TBD", "priority": "High|Medium|Low"}],
+  "decisions": [{"decision": "what was decided", "rationale": "brief reason"}],
+  "risks": [{"risk": "risk description", "impact": "High|Medium|Low", "mitigation": "suggested mitigation"}],
+  "tickets": [{"type": "Task|Bug|Story", "title": "short ticket title", "description": "description or acceptance criteria", "assignee": "person or Unassigned", "priority": "High|Medium|Low"}]
+}
+
+Output language: ${lang}
+
+Transcript:
+${transcript}`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error?.message || 'API error ' + resp.status);
+    }
+
+    const data = await resp.json();
+    const raw = data.content.filter(b => b.type === 'text').map(b => b.text).join('');
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+    render(parsed);
+  } catch(e) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('input-section').style.display = 'block';
+    document.getElementById('analyze-btn').disabled = false;
+    const eb = document.getElementById('error-box');
+    eb.textContent = 'Something went wrong: ' + e.message;
+    eb.style.display = 'block';
+  }
+}
+
+function render(d) {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('summary-box').textContent = d.summary || '';
+
+  const actions = d.actions || [];
+  const decisions = d.decisions || [];
+  const risks = d.risks || [];
+  const tickets = d.tickets || [];
+
+  document.getElementById('cnt-a').textContent = actions.length;
+  document.getElementById('cnt-d').textContent = decisions.length;
+  document.getElementById('cnt-r').textContent = risks.length;
+  document.getElementById('cnt-t').textContent = tickets.length;
+  document.getElementById('b-a').textContent = actions.length;
+  document.getElementById('b-d').textContent = decisions.length;
+  document.getElementById('b-r').textContent = risks.length;
+  document.getElementById('b-t').textContent = tickets.length;
+
+  const la = document.getElementById('list-a');
+  la.innerHTML = actions.map(a => `
+    <div class="item">
+      <div class="item-main">${esc(a.task)}</div>
+      <div class="item-meta">
+        <span class="meta-tag"><i class="ti ti-user" aria-hidden="true" style="font-size:12px"></i>${esc(a.owner)}</span>
+        <span class="meta-tag"><i class="ti ti-clock" aria-hidden="true" style="font-size:12px"></i>${esc(a.due)}</span>
+        <span style="font-size:11px;font-weight:600;color:${priorityColor(a.priority)}">${esc(a.priority)}</span>
+      </div>
+    </div>`).join('');
+
+  const ld = document.getElementById('list-d');
+  ld.innerHTML = decisions.map(dec => `
+    <div class="item">
+      <div class="item-main">${esc(dec.decision)}</div>
+      ${dec.rationale ? `<div class="item-meta">${esc(dec.rationale)}</div>` : ''}
+    </div>`).join('');
+
+  const lr = document.getElementById('list-r');
+  lr.innerHTML = risks.map(r => `
+    <div class="item">
+      <div class="item-main">${esc(r.risk)}</div>
+      <div class="item-meta">
+        <span style="font-size:11px;font-weight:600;color:${priorityColor(r.impact)}">${esc(r.impact)} impact</span>
+        ${r.mitigation ? `<span>${esc(r.mitigation)}</span>` : ''}
+      </div>
+    </div>`).join('');
+
+  const lt = document.getElementById('list-t');
+  lt.innerHTML = tickets.map(t => `
+    <div class="item">
+      <div class="ticket">
+        <div class="ticket-type">${esc(t.type)} · ${esc(t.priority)} · ${esc(t.assignee)}</div>
+        <div class="ticket-title">${esc(t.title)}</div>
+        <div class="ticket-desc">${esc(t.description)}</div>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('analyze-btn').disabled = false;
+}
+
+function reset() {
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('input-section').style.display = 'block';
+  document.getElementById('transcript').value = '';
+}
+</script>
+</body>
+</html>
